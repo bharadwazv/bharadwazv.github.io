@@ -29,7 +29,7 @@
         client.onMessageArrived = onMessageArrived;
 
         // Connect the client
-        client.connect({ onSuccess: onConnect });
+        client.connect({ onSuccess: onConnect, useSSL: true });
 
         const statusElement = document.getElementById('status');
 
