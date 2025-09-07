@@ -52,6 +52,12 @@
             // Subscribe to the status topic
             client.subscribe(statusTopic);
             console.log("Subscribed to: " + statusTopic);
+
+
+            const message = new Paho.MQTT.Message("REQUEST_STATUS");
+            message.destinationName = commandTopic;
+            client.send(message);
+            console.log("Sent 'REQUEST_STATUS' message to topic: " + requestTopic);
         }
 
         function onConnectionLost(responseObject) {
