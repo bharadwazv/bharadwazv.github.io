@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ESP32 LED Control</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
+    <style>
+        body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+        button { font-size: 24px; padding: 15px 30px; cursor: pointer; }
+        #status { margin-top: 20px; color: grey; }
+    </style>
+</head>
+<body>
+    <h1>ESP32 Remote LED</h1>
+    <button onclick="blinkLed()">Blink LED</button>
+    <p id="status">Connecting to broker...</p>
+
+    <script>
+        // --- Use the same details as your ESP32 sketch ---
+        const brokerHost = "broker.hivemq.com";
+        const brokerPort = 8000; // Use WebSocket port
+        const topic = "esp32/your_unique_name/led"; // <-- IMPORTANT: Use the exact same topic!
+        
+        // Create a client instance with a unique client ID
+        const clientId = "web-client-" + Math.random().toString(16).substr(2, 8);
+        const client = new Paho.MQTT.Client(brokerHost, brokerPort, clientId);
+
+        // Set callback handlers
+        client.onConnectionLost = onConnectionLost;
+        client.onMessageArrived = onMessageArrived;
+
+        // Connect the client
+        client.connect({ onSuccess: onConnect });
+
+        const statusElement = document.getElementById('status');
+
+        function onConnect() {
+            console.log("Connected to MQTT broker");
+            statusElement.textContent = "Connected!";
+        }
+
+        function onConnectionLost(responseObject) {
+            if (responseObject.errorCode !== 0) {
+                console.log("onConnectionLost:" + responseObject.errorMessage);
+                statusElement.textContent = "Connection lost. Please refresh.";
+            }
+        }
+
+        function onMessageArrived(message) {
+            console.log("onMessageArrived:" + message.payloadString);
+        }
+
+        // Function to publish the "BLINK" message
+        function blinkLed() {
+            if (!client.isConnected()) {
+                alert("Not connected to the broker yet!");
+                return;
+            }
+            const message = new Paho.MQTT.Message("BLINK");
+            message.destinationName = topic;
+            client.send(message);
+            console.log("Sent 'BLINK' message to topic: " + topic);
+        }
+    </script>
+</body>
+</html>
