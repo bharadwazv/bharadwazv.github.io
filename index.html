@@ -57,7 +57,7 @@
             const message = new Paho.MQTT.Message("REQUEST_STATUS");
             message.destinationName = commandTopic;
             client.send(message);
-            console.log("Sent 'REQUEST_STATUS' message to topic: " + requestTopic);
+            console.log("Sent 'REQUEST_STATUS' message to topic: " + commandTopic);
         }
 
         function onConnectionLost(responseObject) {
